@@ -5,7 +5,8 @@ import numpy as np
 import matlab.engine
 import scipy.io as sio
 import matplotlib.pyplot as plt
-import os
+import os, sys
+import paramiko
 
 class TNMRGradEnv(gym.Env):
     def __init__(self, action_dim: int = 1, size: Tuple[int, int] = (1, 1362)):
@@ -18,6 +19,11 @@ class TNMRGradEnv(gym.Env):
         self._current_step = 0
         self._n_grad_measurement_averages = 1.0
         self.action_scale = 20
+
+        # info for communicating to the TNMR magnet
+        self.remote_ip = '10.115.11.112'
+        self.remote_username = 'grissom lfi'
+        self.remote_password = ''
 
         # constraints
         self.upper_amp_limit = 100
@@ -51,16 +57,20 @@ class TNMRGradEnv(gym.Env):
         # When you reach the end of the pulse, measure the full waveform and record all relevant information to compute episode reward
         if self._current_step == self._n_steps-1:
 
-            sio.savemat('designed_gradient_pulse.mat',{'designed_p':self.preemphasized_waveform})
-            #plt.plot(np.squeeze(self.preemphasized_waveform))
-            #plt.show()
+            designed_waveform_filename = 'designed_gradient_pulse.mat'
+            output_filename = 'current_measurement_data.mat'
+            sio.savemat(designed_waveform_filename,{'designed_p':self.preemphasized_waveform})
+
             print('Measuring on TNMR...')
             try:
                 os.remove('current_measurement_data.mat') # remove the old copy of the data
             except OSError:
                 pass
-            matlab_done = self.matlab_eng.iterative_measurement_function(self._n_grad_measurement_averages)
-            recorded_data = sio.loadmat('current_measurement_data.mat')
+            
+            self._execute_remote_measurement(designed_waveform_filename, output_filename, int(self._n_grad_measurement_averages))
+
+            #matlab_done = self.matlab_eng.iterative_measurement_function(self._n_grad_measurement_averages)
+            recorded_data = sio.loadmat(output_filename)
             error_v = recorded_data['error']
             measured_waveform = recorded_data['measured_waveform']
             print('Done measuring on TNMR!')
@@ -100,6 +110,60 @@ class TNMRGradEnv(gym.Env):
 
     def render(self, mode="human", close=False):
         # no need to implement this
+        pass
+
+    def _execute_remote_measurement(self, designed_waveform_filename, output_filename, n_averages):
+
+        # Step 1: Put the designed waveform file on the remote (TNMR)
+        self._put_file_on_remote(designed_waveform_filename, 'D:/Jonathan/gradient_RL_lowfield/'+designed_waveform_filename)
+
+        # Step 2: Execute the remote script which makes the measurement 
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(self.remote_ip, self.remote_username, self.remote_password)
+        stdout = client.exec_command('python run_matlab_engine.py '+str(n_averages))
+
+        # Step 3: Get the measurement files
+        self._get_file_from_remote('D:/Jonathan/gradient_RL_lowfield/'+output_filename, output_filename)
+        return 
+        
+
+    def _get_file_from_remote(self, remotepath, filepath, verbose=False):
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(self.remote_ip, self.remote_username, self.remote_password)
+        
+        if verbose:
+            print(f'Getting file: {filepath}')
+        try:
+            sftp = client.open_sftp()
+            sftp.get(remotepath=remotepath, localpath=filepath)
+            sftp.close()
+
+        except:
+            print('Getting file from remote failed')
+        
+        client.close()
+
+    def _put_file_on_remote(self, filepath, remotepath, verbose=False):
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(self.remote_ip, self.remote_username, self.remote_password)
+        
+        if verbose:
+            print(f'Putting file: {filepath}')
+        try:
+            sftp = client.open_sftp()
+            sftp.put(localpath=filepath, remotepath=remotepath)
+            sftp.close()
+
+        except:
+            print('Putting file to remote failed')
+        
+        client.close()
+
+
+    def _run_remote_measurement(self):
         pass
     
     def _get_obs(self):
