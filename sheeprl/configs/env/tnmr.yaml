@@ -1,0 +1,16 @@
+defaults:
+  - default
+  - _self_
+
+# Override from `default` config
+id: TNMRGradEnv
+max_episode_steps: 2000
+num_envs: 1
+capture_video: False
+
+
+# Wrapper to be instantiated
+wrapper:
+  _target_: sheeprl.utils.env.get_dummy_env
+  #_target_: gymnasium.make
+  id: ${env.id}

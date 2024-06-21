@@ -244,6 +244,10 @@ def get_dummy_env(id: str):
         from sheeprl.envs.dummy import DiscreteDummyEnv
 
         env = DiscreteDummyEnv()
+    elif "TNMRGradEnv" in id:
+        from sheeprl.envs.tnmr import TNMRGradEnv
+
+        env = TNMRGradEnv()
     else:
         raise ValueError(f"Unrecognized dummy environment: {id}")
     return env
