@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 import gymnasium as gym
 import numpy as np
-import matlab.engine
+#import matlab.engine
 import scipy.io as sio
 import matplotlib.pyplot as plt
 import os, sys
@@ -30,9 +30,9 @@ class TNMRGradEnv(gym.Env):
         self.lower_amp_limit = -100
 
         # initialize matlab
-        eng = matlab.engine.start_matlab()
-        self.matlab_eng = eng
-        print('TNMR GRAD ENVIRONMENT INITIALIZED')
+        #eng = matlab.engine.start_matlab()
+        #self.matlab_eng = eng
+        #print('TNMR GRAD ENVIRONMENT INITIALIZED')
 
 
 
@@ -40,12 +40,8 @@ class TNMRGradEnv(gym.Env):
         print(f'CURRENT STEP ={self._current_step}, ACTION = {action}')
 
         # get the preemphasis. Make sure to clip so that the net waveform does not violate amplitude constraints
-        # TODO: with rescaling this is not actually clipping....
+ 
         current_ideal_waveform_sample = self.ideal_waveform[:,self._current_step]
-        #if current_ideal_waveform_sample > 0:
-            #action = np.clip(action, -1, 1-current_ideal_waveform_sample/self.upper_amp_limit)
-        #if current_ideal_waveform_sample < 0:
-            #action = np.clip(action, self.lower_amp_limit+current_ideal_waveform_sample, self.upper_amp_limit)
         
         action = action * self.action_scale
         self.preemphasis_v[:,self._current_step] = action
