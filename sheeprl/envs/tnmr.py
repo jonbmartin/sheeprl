@@ -117,7 +117,7 @@ class TNMRGradEnv(gym.Env):
         # Step 2: Execute the remote script which makes the measurement 
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(self.remote_ip, self.remote_username, self.remote_password)
+        client.connect(self.remote_ip, username=self.remote_username, password=self.remote_password)
         stdout = client.exec_command('python run_matlab_engine.py '+str(n_averages))
 
         # Step 3: Get the measurement files
@@ -128,7 +128,7 @@ class TNMRGradEnv(gym.Env):
     def _get_file_from_remote(self, remotepath, filepath, verbose=False):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(self.remote_ip, self.remote_username, self.remote_password)
+        client.connect(self.remote_ip, username=self.remote_username, passwordself.remote_password)
         
         if verbose:
             print(f'Getting file: {filepath}')
@@ -145,7 +145,7 @@ class TNMRGradEnv(gym.Env):
     def _put_file_on_remote(self, filepath, remotepath, verbose=False):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(self.remote_ip, self.remote_username, self.remote_password)
+        client.connect(self.remote_ip, username=self.remote_username, password=self.remote_password)
         
         if verbose:
             print(f'Putting file: {filepath}')
