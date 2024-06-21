@@ -5,7 +5,7 @@ import numpy as np
 #import matlab.engine
 import scipy.io as sio
 import matplotlib.pyplot as plt
-import os, sys
+import os, sys, time
 import paramiko
 
 class TNMRGradEnv(gym.Env):
@@ -119,6 +119,8 @@ class TNMRGradEnv(gym.Env):
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         client.connect(self.remote_ip, username=self.remote_username, password=self.remote_password)
         stdout = client.exec_command('python run_matlab_engine.py '+str(n_averages))
+        #need to wait a second for measurement: 
+        time.sleep(10)
 
         # Step 3: Get the measurement files
         self._get_file_from_remote('D:/Jonathan/gradient_RL_lowfield/'+output_filename, output_filename, verbose=True)
