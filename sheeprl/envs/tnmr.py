@@ -13,6 +13,7 @@ class TNMRGradEnv(gym.Env):
         self.action_space = gym.spaces.Box(-1, 1, shape=(action_dim,)) # bounded to reasonable values based on the achievable slew
         self.observation_space = gym.spaces.Box(-100, 100, shape=size, dtype=np.float32)
         self.reward_range = (-np.inf, np.inf)
+        
         self.ideal_waveform = sio.loadmat('ideal_gradient_pulse.mat')['ideal_p']
         self.preemphasized_waveform = self.ideal_waveform
         self._n_steps = self.ideal_waveform.size
