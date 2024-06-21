@@ -128,7 +128,7 @@ class TNMRGradEnv(gym.Env):
     def _get_file_from_remote(self, remotepath, filepath, verbose=False):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(self.remote_ip, username=self.remote_username, passwordself.remote_password)
+        client.connect(self.remote_ip, username=self.remote_username, password=self.remote_password)
         
         if verbose:
             print(f'Getting file: {filepath}')
