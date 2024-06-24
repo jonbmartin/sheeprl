@@ -22,8 +22,8 @@ class TNMRGradEnv(gym.Env):
         self.action_scale = 20
 
         # info for communicating to the TNMR magnet
-        self.remote_ip = '10.252.76.88'
-        self.remote_username = 'grissomlfi'
+        self.remote_ip = '10.115.11.92'
+        self.remote_username = 'jonathan'
         self.remote_password = ''
 
         # constraints
