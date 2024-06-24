@@ -22,8 +22,8 @@ class TNMRGradEnv(gym.Env):
         self.action_scale = 20
 
         # info for communicating to the TNMR magnet
-        self.remote_ip = '10.115.11.112'
-        self.remote_username = 'grissom lfi'
+        self.remote_ip = '10.252.76.88'
+        self.remote_username = 'grissomlfi'
         self.remote_password = ''
 
         # constraints
@@ -118,9 +118,11 @@ class TNMRGradEnv(gym.Env):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         client.connect(self.remote_ip, username=self.remote_username, password=self.remote_password)
-        stdout = client.exec_command('python run_matlab_engine.py '+str(n_averages))
+        print('Executing measurement script on remote')
+        command_string = 'python run_matlab_engine.py '+str(n_averages)
+        stdout = client.exec_command(command_string)
         #need to wait a second for measurement: 
-        time.sleep(10)
+        time.sleep(20)
 
         # Step 3: Get the measurement files
         self._get_file_from_remote('D:/Jonathan/gradient_RL_lowfield/'+output_filename, output_filename, verbose=True)
