@@ -17,10 +17,8 @@ algo:
   #  encoder: [rgb]
   #  decoder: [rgb]
   mlp_keys:
-    encoder: 
-      - pulse
-    decoder:
-      - pulse
+    encoder: [pulse]
+    decoder: [pulse]
 # Checkpoint
 checkpoint:
   every: 100000
