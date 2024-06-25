@@ -61,7 +61,7 @@ class TNMRGradEnv(gym.Env):
         current_ideal_waveform_sample = self.ideal_waveform[:,self._current_step]
         
         action = action * self.action_scale
-        self.preemphasis_v[:,self._current_step] = action
+        self.preemphasis_v[self._current_step] = action
 
         self.preemphasized_waveform = self.ideal_waveform + self.preemphasis_v
 
