@@ -17,6 +17,10 @@ class TNMRGradEnv(gym.Env):
         self.reward_range = (-np.inf, np.inf)
 
         self.ideal_waveform = sio.loadmat('ideal_gradient_pulse.mat')['ideal_p']
+        print('***********CHECKING IDEAL WAVEFORM***********')
+        print(np.shape(self.ideal_waveform))
+        print(self.ideal_waveform.type())
+
         self.preemphasized_waveform = self.ideal_waveform
         self._n_steps = self.ideal_waveform.size
         self._current_step = 0
@@ -170,7 +174,7 @@ class TNMRGradEnv(gym.Env):
         return self.preemphasized_waveform
     
 
-    def _convert_obs(self, obs) -> Dict[str, np.ndarray]:
+    def _convert_obs(self, obs: np.ndarray) -> Dict[str, np.ndarray]:
         return {"pulse": obs}
     
     def close(self):
