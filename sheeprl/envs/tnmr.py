@@ -29,8 +29,8 @@ class TNMRGradEnv(gym.Env):
         self.reward_range = (-np.inf, np.inf)
 
         self.ideal_waveform = np.squeeze(sio.loadmat('ideal_gradient_pulse.mat')['ideal_p'])
-        self.ideal_waveform = self.ideal_waveform.astype('float')
-        print(self.ideal_waveform)
+        self.ideal_waveform = np.array(self.ideal_waveform.astype('float'))
+
         self.preemphasized_waveform = self.ideal_waveform.astype('float')
         self._n_steps = self.ideal_waveform.size
         self._current_step = 0
