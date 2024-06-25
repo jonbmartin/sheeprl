@@ -109,11 +109,8 @@ class TNMRGradEnv(gym.Env):
 
         return observation, {}
     
-    @property
-    def render_mode(self) -> str | None:
-        return self._render_mode
 
-    def render(self, mode=None, close=False):
+    def render(self, mode="human", close=False):
         pass
 
     def _execute_remote_measurement(self, designed_waveform_filename, output_filename):
