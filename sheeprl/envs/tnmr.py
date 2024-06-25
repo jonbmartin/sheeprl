@@ -22,9 +22,9 @@ class TNMRGradEnv(gym.Env):
         self.action_scale = 20
 
         # info for communicating to the TNMR magnet
-        self.remote_ip = '10.115.11.92'
-        self.remote_username = 'jonathan'
-        self.remote_password = ''
+        self.remote_ip = '10.115.11.91'
+        self.remote_username = 'grissomlfi'
+        self.remote_password = os.environ['GRISSOM_LFI_PWD']
 
         # constraints
         self.upper_amp_limit = 100
@@ -64,12 +64,13 @@ class TNMRGradEnv(gym.Env):
             except OSError:
                 pass
             
-            self._execute_remote_measurement(designed_waveform_filename, output_filename, int(self._n_grad_measurement_averages))
+            self._execute_remote_measurement(designed_waveform_filename, output_filename)
 
             #matlab_done = self.matlab_eng.iterative_measurement_function(self._n_grad_measurement_averages)
             recorded_data = sio.loadmat(output_filename)
             error_v = recorded_data['error']
             measured_waveform = recorded_data['measured_waveform']
+ 
             print('Done measuring on TNMR!')
 
             reward = - np.sum(np.abs(error_v**2))
@@ -109,23 +110,17 @@ class TNMRGradEnv(gym.Env):
         # no need to implement this
         pass
 
-    def _execute_remote_measurement(self, designed_waveform_filename, output_filename, n_averages):
+    def _execute_remote_measurement(self, designed_waveform_filename, output_filename):
 
         # Step 1: Put the designed waveform file on the remote (TNMR)
-        self._put_file_on_remote(designed_waveform_filename, 'D:/Jonathan/gradient_RL_lowfield/'+designed_waveform_filename, verbose=True)
+        self._put_file_on_remote(designed_waveform_filename, 'D:/Jonathan/gradient_RL_lowfield/io/'+designed_waveform_filename, verbose=True)
 
-        # Step 2: Execute the remote script which makes the measurement 
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(self.remote_ip, username=self.remote_username, password=self.remote_password)
-        print('Executing measurement script on remote')
-        command_string = 'python run_matlab_engine.py '+str(n_averages)
-        stdout = client.exec_command(command_string)
-        #need to wait a second for measurement: 
-        time.sleep(20)
+        # Step 2: (On the remote....) Perform the measurement. The design file will be taken up, and a measurement file will be generated.
+        # During this time, just wait.
+        time.sleep(30)
 
         # Step 3: Get the measurement files
-        self._get_file_from_remote('D:/Jonathan/gradient_RL_lowfield/'+output_filename, output_filename, verbose=True)
+        self._get_file_from_remote('D:/Jonathan/gradient_RL_lowfield/io/'+output_filename, output_filename, verbose=True)
         return 
         
 
