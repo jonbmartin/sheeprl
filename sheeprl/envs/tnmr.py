@@ -105,7 +105,7 @@ class TNMRGradEnv(gym.Env):
         self.preemphasis_v = np.zeros((1,self._n_steps))
         self.preemphasized_waveform = self.ideal_waveform
 
-        observation = self._convert_obs(self._get_obs())
+        observation = self._get_obs()
 
         return observation, {}
     
