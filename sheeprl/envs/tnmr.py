@@ -11,14 +11,24 @@ import os, sys, time
 import paramiko
 
 class TNMRGradEnv(gym.Env):
-    def __init__(self, action_dim: int = 1, size: Tuple[int] = (1362,)):
+    def __init__(self, action_dim: int = 1,
+                  vector_size: Tuple[int] = (1362,),
+                  dict_obs_space: bool = True,):
         self.action_space = gym.spaces.Box(-1, 1, shape=(action_dim,)) # bounded to reasonable values based on the achievable slew
-        self.observation_space = gym.spaces.Box(-100, 100, shape=size, dtype=np.float32)
+        
+        self._dict_obs_space = dict_obs_space
+        if self._dict_obs_space:
+            self.observation_space = gym.spaces.Dict(
+                {
+                    "pulse": gym.spaces.Box(-100, 100, shape=vector_size, dtype=np.float32),
+                }
+            )
+        else:
+            self.observation_space = gym.spaces.Box(-100, 100, shape=vector_size, dtype=np.float32)
+        
         self.reward_range = (-np.inf, np.inf)
 
         self.ideal_waveform = np.squeeze(sio.loadmat('ideal_gradient_pulse.mat')['ideal_p'])
-        print('***********CHECKING IDEAL WAVEFORM***********')
-        print(np.shape(self.ideal_waveform))
 
         self.preemphasized_waveform = self.ideal_waveform
         self._n_steps = self.ideal_waveform.size
@@ -87,7 +97,7 @@ class TNMRGradEnv(gym.Env):
         done = self._current_step == self._n_steps-1
         self._current_step += 1
 
-        observation = self._convert_obs(self._get_obs())
+        observation = self.get_obs()
         #plt.plot(np.transpose(observation))
         #plt.show()
 
@@ -108,7 +118,7 @@ class TNMRGradEnv(gym.Env):
         self.preemphasis_v = np.zeros((1,self._n_steps))
         self.preemphasized_waveform = self.ideal_waveform
 
-        observation = self._convert_obs(self._get_obs())
+        observation = self.get_obs()
 
         return observation, {}
     
@@ -164,13 +174,16 @@ class TNMRGradEnv(gym.Env):
         
         client.close()
 
-
-    def _run_remote_measurement(self):
-        pass
     
-    def _get_obs(self):
-        #return np.concatenate((self.preemphasis_v, self.ideal_waveform), axis=0)
-        return self.preemphasized_waveform
+    def get_obs(self) -> Dict[str, np.ndarray]:
+        if self._dict_obs_space:
+            return {
+                # da sostituire con np.random.rand
+                "pulse": np.full(self.observation_space["pulse"].shape, self._current_step, dtype=np.float32),
+            }
+        else:
+            return np.full(self.observation_space.shape, self._current_step, dtype=np.float32)
+
     
 
     def _convert_obs(self, obs: np.ndarray) -> Dict[str, np.ndarray]:
