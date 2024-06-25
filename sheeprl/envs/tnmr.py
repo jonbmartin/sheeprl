@@ -103,7 +103,7 @@ class TNMRGradEnv(gym.Env):
 
         return (
             observation,
-            reward,
+            np.zeros(reward, dtype=np.float32).item(),
             done,
             False,
             {},
