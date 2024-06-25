@@ -58,7 +58,7 @@ class TNMRGradEnv(gym.Env):
 
         # get the preemphasis. Make sure to clip so that the net waveform does not violate amplitude constraints
  
-        current_ideal_waveform_sample = self.ideal_waveform[:,self._current_step]
+        #current_ideal_waveform_sample = self.ideal_waveform[:,self._current_step]
         
         action = action * self.action_scale
         self.preemphasis_v[self._current_step] = action
