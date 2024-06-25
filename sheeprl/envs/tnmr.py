@@ -84,7 +84,7 @@ class TNMRGradEnv(gym.Env):
         done = self._current_step == self._n_steps-1
         self._current_step += 1
 
-        observation = self._get_obs()
+        observation = self._convert_obs(self._get_obs())
         #plt.plot(np.transpose(observation))
         #plt.show()
 
@@ -105,7 +105,7 @@ class TNMRGradEnv(gym.Env):
         self.preemphasis_v = np.zeros((1,self._n_steps))
         self.preemphasized_waveform = self.ideal_waveform
 
-        observation = self._get_obs()
+        observation = self._convert_obs(self._get_obs())
 
         return observation, {}
     
