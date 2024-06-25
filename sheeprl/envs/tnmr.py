@@ -170,7 +170,7 @@ class TNMRGradEnv(gym.Env):
         return self.preemphasized_waveform
     
 
-    def _convert_obs(self, obs: np.ndarray) -> Dict[str, np.ndarray]:
+    def _convert_obs(self, obs) -> Dict[str, np.ndarray]:
         return {"pulse": obs}
     
     def close(self):
