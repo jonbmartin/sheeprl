@@ -43,7 +43,7 @@ class BaseDummyEnv(gym.Env, ABC):
         if self._dict_obs_space:
             return {
                 # da sostituire con np.random.rand
-                "rgb": np.full(self.observation_space["rgb"].shape, self._current_step % 256, dtype=np.uint8),
+                "rgb": np.full(self.observation_space["rgb"].shape, , dtype=np.uint8),
                 "state": np.full(self.observation_space["state"].shape, self._current_step, dtype=np.uint8),
             }
         else:
