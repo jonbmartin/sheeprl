@@ -1,15 +1,17 @@
-from typing import List, Tuple
+from typing import List, Tuple, Any, Dict, Optional, Sequence, SupportsFloat
 
 import gymnasium as gym
+from gymnasium import spaces
+from gymnasium.core import RenderFrame
 import numpy as np
-#import matlab.engine
+
 import scipy.io as sio
 import matplotlib.pyplot as plt
 import os, sys, time
 import paramiko
 
 class TNMRGradEnv(gym.Env):
-    def __init__(self, action_dim: int = 1, size: Tuple[int, int] = (1, 1362)):
+    def __init__(self, action_dim: int = 1, size: Tuple[int] = (1362,)):
         self.action_space = gym.spaces.Box(-1, 1, shape=(action_dim,)) # bounded to reasonable values based on the achievable slew
         self.observation_space = gym.spaces.Box(-100, 100, shape=size, dtype=np.float32)
         self.reward_range = (-np.inf, np.inf)
@@ -25,6 +27,7 @@ class TNMRGradEnv(gym.Env):
         self.remote_ip = '10.115.11.91'
         self.remote_username = 'grissomlfi'
         self.remote_password = os.environ['GRISSOM_LFI_PWD']
+        self.render_mode='human'
 
         # constraints
         self.upper_amp_limit = 100
@@ -81,7 +84,7 @@ class TNMRGradEnv(gym.Env):
         done = self._current_step == self._n_steps-1
         self._current_step += 1
 
-        observation = self._get_obs()
+        observation = self._convert_obs(self._get_obs())
         #plt.plot(np.transpose(observation))
         #plt.show()
 
@@ -102,13 +105,16 @@ class TNMRGradEnv(gym.Env):
         self.preemphasis_v = np.zeros((1,self._n_steps))
         self.preemphasized_waveform = self.ideal_waveform
 
-        observation = self._get_obs()
+        observation = self._convert_obs(self._get_obs())
 
         return observation, {}
+    
+    @property
+    def render_mode(self) -> str | None:
+        return self._render_mode
 
-    def render(self, mode="human", close=False):
-        # no need to implement this
-        pass
+    def render(self) -> Optional[Union[RenderFrame, List[RenderFrame]]]:
+        return self.env.render()
 
     def _execute_remote_measurement(self, designed_waveform_filename, output_filename):
 
@@ -165,7 +171,11 @@ class TNMRGradEnv(gym.Env):
     def _get_obs(self):
         #return np.concatenate((self.preemphasis_v, self.ideal_waveform), axis=0)
         return self.preemphasized_waveform
+    
 
+    def _convert_obs(self, obs: np.ndarray) -> Dict[str, np.ndarray]:
+        return {"pulse": obs}
+    
     def close(self):
         pass
 
