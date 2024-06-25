@@ -27,7 +27,7 @@ class TNMRGradEnv(gym.Env):
             self.observation_space = gym.spaces.Box(-100, 100, shape=vector_size, dtype=np.float32)
         
         self.reward_range = (-np.inf, np.inf)
-
+        
         self.ideal_waveform = np.squeeze(sio.loadmat('ideal_gradient_pulse.mat')['ideal_p'])
         self.ideal_waveform = self.ideal_waveform.astype('float')
         self.preemphasized_waveform = self.ideal_waveform.astype('float')
