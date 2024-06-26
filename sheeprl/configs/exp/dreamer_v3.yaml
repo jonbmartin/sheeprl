@@ -1,7 +1,7 @@
 # @package _global_
 
 defaults:
-  - override /algo: dreamer_v3_XS # JBM changed to XS from S
+  - override /algo: dreamer_v3_XXS # JBM changed to XXS from S
   - override /env: atari
   - override /model_manager: dreamer_v3
   - _self_
