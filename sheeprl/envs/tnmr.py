@@ -15,7 +15,7 @@ class TNMRGradEnv(gym.Env):
                   vector_size: Tuple[int] = (130,),
                   dict_obs_space: bool = True,):
         self.action_space = gym.spaces.Box(-1, 1, shape=(action_dim,)) # bounded to reasonable values based on the achievable slew
-        
+        self.window_size = vector_size[0]
         self._dict_obs_space = dict_obs_space
         if self._dict_obs_space:
             self.observation_space = gym.spaces.Dict(
@@ -30,7 +30,8 @@ class TNMRGradEnv(gym.Env):
 
         self.ideal_waveform = np.squeeze(sio.loadmat('ideal_gradient_pulse.mat')['ideal_p'])
         self.ideal_waveform = np.array(self.ideal_waveform.astype('float'))
-        self.ideal_waveform_padded = np.concatenate((np.zeros(vector_size),self.ideal_waveform, np.zeros(vector_size)),2)
+        self.ideal_waveform_padded = np.concatenate([np.zeros(vector_size),self.ideal_waveform, np.zeros(vector_size)])
+        print(np.shape(self.ideal_waveform_padded))
 
         self.preemphasized_waveform = self.ideal_waveform.astype('float')
         self._n_steps = self.ideal_waveform.size
@@ -177,13 +178,15 @@ class TNMRGradEnv(gym.Env):
         client.close()
 
     
-    def get_obs(self) -> Dict[str, np.ndarray]:
+    def get_obs(self) -> Dict[str, np.ndarray]: 
+        current_point_in_padded = self._current_step + self.window_size
+        ideal_window = self.ideal_waveform_padded[(current_point_in_padded-self.window_size//2):(current_point_in_padded + self.window_size//2)]
         if self._dict_obs_space:
             return {
-                "pulse": np.squeeze(np.array(self.preemphasized_waveform, dtype=np.float32)),
+                "pulse": np.squeeze(np.array(ideal_window, dtype=np.float32)),
             }
         else:
-            return np.squeeze(np.array(self.preemphasized_waveform, dtype=np.float32))
+            return np.squeeze(np.array(ideal_window, dtype=np.float32))
 
     
 
