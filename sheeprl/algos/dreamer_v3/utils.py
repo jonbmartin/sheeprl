@@ -84,8 +84,8 @@ def prepare_obs(
     for k, v in obs.items():
         print('debugging!!!!')
         print(k)
-        print(v)
         v = v[0]
+        print(v)
 
         torch_obs[k] = torch.from_numpy(v.copy()).to(fabric.device).float()
         if k in cnn_keys:
