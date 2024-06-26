@@ -87,7 +87,7 @@ def prepare_obs(
         v = v[0]
         print(v)
 
-        intermediate_obs = torch.from_numpy(np.asarray(v.copy()))
+        intermediate_obs = torch.from_numpy(np.array(v.copy()).astype('float'))
         torch_obs[k] = intermediate_obs.to(fabric.device).float()
         if k in cnn_keys:
             torch_obs[k] = torch_obs[k].view(1, num_envs, -1, *v.shape[-2:]) / 255 - 0.5
