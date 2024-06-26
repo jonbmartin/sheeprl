@@ -13,7 +13,7 @@ import paramiko
 class TNMRGradEnv(gym.Env):
     def __init__(self, action_dim: int = 1,
                   vector_size: Tuple[int] = (1362,),
-                  dict_obs_space: bool = False,):
+                  dict_obs_space: bool = True,):
         self.action_space = gym.spaces.Box(-1, 1, shape=(action_dim,)) # bounded to reasonable values based on the achievable slew
         
         self._dict_obs_space = dict_obs_space
@@ -176,7 +176,7 @@ class TNMRGradEnv(gym.Env):
         client.close()
 
     
-    def get_obs(self) -> Dict[str, np.ndarray]:
+    def get_obs(self) -> Dict[str, Any]:
         if self._dict_obs_space:
             return {
                 "pulse": np.squeeze(np.array(self.preemphasized_waveform)),
@@ -186,7 +186,7 @@ class TNMRGradEnv(gym.Env):
 
     
 
-    def _convert_obs(self, obs: np.ndarray) -> Dict[str, np.ndarray]:
+    def _convert_obs(self, obs: np.ndarray) -> Dict[str, Any]:
         return {"pulse": obs}
     
     def close(self):
