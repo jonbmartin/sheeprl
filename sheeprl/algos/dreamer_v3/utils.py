@@ -82,6 +82,10 @@ def prepare_obs(
 ) -> Dict[str, Tensor]:
     torch_obs = {}
     for k, v in obs.items():
+        test=v.copy()
+        print('debugging!!!!')
+        print(np.shape(test))
+        print(test.dtype)
         torch_obs[k] = torch.from_numpy(v.copy()).to(fabric.device).float()
         if k in cnn_keys:
             torch_obs[k] = torch_obs[k].view(1, num_envs, -1, *v.shape[-2:]) / 255 - 0.5
