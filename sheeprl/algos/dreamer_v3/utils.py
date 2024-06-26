@@ -82,8 +82,9 @@ def prepare_obs(
 ) -> Dict[str, Tensor]:
     torch_obs = {}
     for k, v in obs.items():
-        test=v.copy()
         print('debugging!!!!')
+        print(k)
+        print(v)
         print(np.shape(test))
         print(test.dtype)
         torch_obs[k] = torch.from_numpy(v.copy()).to(fabric.device).float()
