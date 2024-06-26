@@ -13,7 +13,7 @@ import paramiko
 class TNMRGradEnv(gym.Env):
     def __init__(self, action_dim: int = 1,
                   vector_size: Tuple[int] = (1362,),
-                  dict_obs_space: bool = True,):
+                  dict_obs_space: bool = False,):
         self.action_space = gym.spaces.Box(-1, 1, shape=(action_dim,)) # bounded to reasonable values based on the achievable slew
         
         self._dict_obs_space = dict_obs_space
