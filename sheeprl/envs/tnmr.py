@@ -12,7 +12,7 @@ import paramiko
 
 class TNMRGradEnv(gym.Env):
     def __init__(self, id:str, action_dim: int = 1,
-                  vector_size: Tuple[int] = (1362,),
+                  vector_size: Tuple[int] = (130,),
                   dict_obs_space: bool = True,):
         self.action_space = gym.spaces.Box(-1, 1, shape=(action_dim,)) # bounded to reasonable values based on the achievable slew
         
@@ -30,6 +30,7 @@ class TNMRGradEnv(gym.Env):
 
         self.ideal_waveform = np.squeeze(sio.loadmat('ideal_gradient_pulse.mat')['ideal_p'])
         self.ideal_waveform = np.array(self.ideal_waveform.astype('float'))
+        self.ideal_waveform_padded = np.concatenate((np.zeros(vector_size),self.ideal_waveform, np.zeros(vector_size)),2)
 
         self.preemphasized_waveform = self.ideal_waveform.astype('float')
         self._n_steps = self.ideal_waveform.size
