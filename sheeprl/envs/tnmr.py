@@ -179,10 +179,10 @@ class TNMRGradEnv(gym.Env):
     def get_obs(self) -> Dict[str, np.ndarray]:
         if self._dict_obs_space:
             return {
-                "pulse": np.array(self.preemphasized_waveform),
+                "pulse": np.squeeze(np.array(self.preemphasized_waveform)),
             }
         else:
-            return np.array(self.preemphasized_waveform)
+            return np.squeeze(np.array(self.preemphasized_waveform))
 
     
 
