@@ -11,6 +11,7 @@ capture_video: False
 
 # Wrapper to be instantiated
 wrapper:
-  _target_: sheeprl.utils.env.get_dummy_env
+  #_target_: sheeprl.utils.env.get_dummy_env
+  _target_: sheeprl.envs.tnmr.TNMRGradEnv
   #_target_: gymnasium.make
   id: ${env.id}
