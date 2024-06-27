@@ -12,7 +12,7 @@ import paramiko
 
 class TNMRGradEnv(gym.Env):
     def __init__(self, id:str, action_dim: int = 1,
-                  vector_size: Tuple[int] = (512,),
+                  vector_size: Tuple[int] = (130,),
                   dict_obs_space: bool = True,):
         self.action_space = gym.spaces.Box(-1, 1, shape=(action_dim,)) # bounded to reasonable values based on the achievable slew
         self.window_size = vector_size[0]
