@@ -16,22 +16,24 @@ class TNMRGradEnv(gym.Env):
                   dict_obs_space: bool = True,):
         self.action_space = gym.spaces.Box(-1, 1, shape=(action_dim,)) # bounded to reasonable values based on the achievable slew
         self.window_size = vector_size[0]
+
+        self.ideal_waveform = np.squeeze(sio.loadmat('ideal_gradient_pulse.mat')['ideal_p'])
+        self.ideal_waveform = np.array(self.ideal_waveform.astype('float'))
+        self.ideal_waveform_padded = np.concatenate([np.zeros(vector_size),self.ideal_waveform, np.zeros(vector_size)])
+        print(np.shape(self.ideal_waveform_padded))
+
         self._dict_obs_space = dict_obs_space
         if self._dict_obs_space:
             self.observation_space = gym.spaces.Dict(
                 {
                     "pulse": gym.spaces.Box(-100, 100, shape=vector_size, dtype=np.float32),
+                    "time": gym.spaces.Box(0.0, np.size(self.ideal_waveform), (1,), dtype=np.float32),
                 }
             )
         else:
             self.observation_space = gym.spaces.Box(-100, 100, shape=vector_size, dtype=np.float32)
         
         self.reward_range = (-np.inf, np.inf)
-
-        self.ideal_waveform = np.squeeze(sio.loadmat('ideal_gradient_pulse.mat')['ideal_p'])
-        self.ideal_waveform = np.array(self.ideal_waveform.astype('float'))
-        self.ideal_waveform_padded = np.concatenate([np.zeros(vector_size),self.ideal_waveform, np.zeros(vector_size)])
-        print(np.shape(self.ideal_waveform_padded))
 
         self.preemphasized_waveform = self.ideal_waveform.astype('float')
         self._n_steps = self.ideal_waveform.size
@@ -184,9 +186,11 @@ class TNMRGradEnv(gym.Env):
         if self._dict_obs_space:
             return {
                 "pulse": np.squeeze(np.array(ideal_window, dtype=np.float32)),
+                "time": np.squeeze(np.array(self._current_step, dtype=np.float)),
             }
         else:
             return np.squeeze(np.array(ideal_window, dtype=np.float32))
+            # TODO: must somehow incorporate time into non-dictionary return!
 
     
 
