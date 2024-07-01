@@ -53,6 +53,7 @@ class TNMRGradEnv(gym.Env):
         self.lower_amp_limit = -100
 
         # set scanner state to false!
+        self.scanner_config_dir = os.getcwd() + "tnmr_scanner_state/tnmr_scanner.yaml"
         self.set_scanner_is_occupied(False)
 
 
@@ -139,7 +140,7 @@ class TNMRGradEnv(gym.Env):
     
     def get_scanner_is_occupied(self):
         # just gets whether the scanner is in use right now or not
-        with open("tnmr_scanner_state/tnmr_scanner.yaml") as f:
+        with open(self.scanner_config_dir) as f:
             cfg_tnmr = yaml.load(f, Loader=yaml.FullLoader)
 
         return cfg_tnmr["scanner_occupied"]
@@ -148,14 +149,14 @@ class TNMRGradEnv(gym.Env):
         # sets the status of the scanner so that other processes know not to scan
 
         # load yaml
-        with open("tnmr_scanner_state/tnmr_scanner.yaml") as f:
+        with open(self.scanner_config_dir) as f:
             cfg_tnmr = yaml.load(f, Loader=yaml.FullLoader)
 
         # modify parameter
         cfg_tnmr["scanner_occupied"] = is_occupied
  
         # write yaml
-        with open("config.yaml", "w") as f:
+        with open(self.scanner_config_dir, "w") as f:
             cfg_tnmr = yaml.dump(
                 cfg_tnmr, stream=f, default_flow_style=False, sort_keys=False
             )
