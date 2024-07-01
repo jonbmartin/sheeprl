@@ -54,6 +54,8 @@ class TNMRGradEnv(gym.Env):
 
         self.env_scanning_id = random.randint(1, 100000)
 
+        self.init_seed = random.randint(1,100000)
+
 
 
     def step(self, action):
@@ -125,6 +127,7 @@ class TNMRGradEnv(gym.Env):
 
     def reset(self, seed=None, options=None):
         # we need the following line to seed self.np_random
+        seed = self.init_seed
         super().reset(seed=seed)
 
         # reset to the beginning of the waveform, and set our preemphasis to 0
@@ -245,5 +248,5 @@ class TNMRGradEnv(gym.Env):
     def close(self):
         pass
 
-    def seed(self, seed=None):
-        pass
+    #def seed(self, seed=None):
+    #    pass
