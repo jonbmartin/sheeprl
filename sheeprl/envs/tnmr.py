@@ -52,7 +52,6 @@ class TNMRGradEnv(gym.Env):
         self.upper_amp_limit = 100
         self.lower_amp_limit = -100
 
-        # set scanner state to false!
         self.env_scanning_id = random.randint(1, 100000)
 
 
@@ -199,7 +198,7 @@ class TNMRGradEnv(gym.Env):
                 sftp.close()
 
             except IOError:
-                print('Getting file from remote failed. Waiting ... ')
+                print('File not ready on remote. Waiting ... ')
 
             else: 
                 file_present = True
