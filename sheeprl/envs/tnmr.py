@@ -54,8 +54,6 @@ class TNMRGradEnv(gym.Env):
 
         # set scanner state to false!
         self.env_scanning_id = random.randint(1, 100000)
-        self.scanner_config_dir = os.getcwd() + "/sheeprl/sheeprl/envs/tnmr_scanner_state/tnmr_scanner.yaml"
-        self.set_scanner_is_occupied(False)
 
 
 
