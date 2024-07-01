@@ -191,7 +191,7 @@ class TNMRGradEnv(gym.Env):
         if verbose:
             print(f'Getting file: {filepath}')
         while not file_present:
-            time.sleep(5)
+            time.sleep(10)
             try:
                 sftp.get(remotepath=remotepath, localpath=filepath)
                 sftp.remove(remotepath)
