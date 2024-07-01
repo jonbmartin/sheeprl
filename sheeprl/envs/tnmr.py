@@ -183,6 +183,7 @@ class TNMRGradEnv(gym.Env):
         
 
     def _get_file_from_remote(self, remotepath, filepath, verbose=False):
+        # waits until the file is present on the other computer, then gets it here 
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         client.connect(self.remote_ip, username=self.remote_username, password=self.remote_password)
@@ -196,6 +197,7 @@ class TNMRGradEnv(gym.Env):
             try:
                 sftp = client.open_sftp()
                 sftp.get(remotepath=remotepath, localpath=filepath)
+                sftp.remove(remotepath)
                 sftp.close()
 
             except IOError:
