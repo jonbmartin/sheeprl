@@ -53,7 +53,7 @@ class TNMRGradEnv(gym.Env):
         self.lower_amp_limit = -100
 
         # set scanner state to false!
-        self.scanner_config_dir = os.getcwd() + "tnmr_scanner_state/tnmr_scanner.yaml"
+        self.scanner_config_dir = os.getcwd() + "sheeprl/sheeprl/envs/tnmr_scanner_state/tnmr_scanner.yaml"
         self.set_scanner_is_occupied(False)
 
 
