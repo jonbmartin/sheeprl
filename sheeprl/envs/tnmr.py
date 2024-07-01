@@ -202,6 +202,7 @@ class TNMRGradEnv(gym.Env):
 
             except IOError:
                 print('Getting file from remote failed. Waiting ... ')
+                sftp.close()
 
             else: 
                 file_present = True
