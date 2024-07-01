@@ -7,7 +7,7 @@ import numpy as np
 
 import scipy.io as sio
 import matplotlib.pyplot as plt
-import os, sys, time
+import os, sys, time, random
 import paramiko
 import yaml
 
@@ -53,6 +53,7 @@ class TNMRGradEnv(gym.Env):
         self.lower_amp_limit = -100
 
         # set scanner state to false!
+        self.env_scanning_id = random.randint(1, 100000)
         self.scanner_config_dir = os.getcwd() + "/sheeprl/sheeprl/envs/tnmr_scanner_state/tnmr_scanner.yaml"
         self.set_scanner_is_occupied(False)
 
@@ -75,23 +76,23 @@ class TNMRGradEnv(gym.Env):
         # When you reach the end of the pulse, measure the full waveform and record all relevant information to compute episode reward
         if self._current_step == self._n_steps-1:
 
-            # check yaml to make sure scanner is not currently scanning
-            tnmr_occupied = self.get_scanner_is_occupied()
+            # # check yaml to make sure scanner is not currently scanning
+            # tnmr_occupied = self.get_scanner_is_occupied()
 
-            while(tnmr_occupied):
-                time.sleep(2)
-                tnmr_occupied = self.get_scanner_is_occupied()
+            # while(tnmr_occupied):
+            #     time.sleep(2)
+            #     tnmr_occupied = self.get_scanner_is_occupied()
             
-            # once free, set as occupied!
-            self.set_scanner_is_occupied(is_occupied=True)
+            # # once free, set as occupied!
+            # self.set_scanner_is_occupied(is_occupied=True)
 
-            designed_waveform_filename = 'designed_gradient_pulse.mat'
-            output_filename = 'current_measurement_data.mat'
+            designed_waveform_filename = 'designed_gradient_pulse_'+str(self.env_scanning_id)+'.mat'
+            output_filename = 'current_measurement_data_'+str(self.env_scanning_id)+'.mat'
             sio.savemat(designed_waveform_filename,{'designed_p':self.preemphasized_waveform})
 
             print('Measuring on TNMR...')
             try:
-                os.remove('current_measurement_data.mat') # remove the old copy of the data
+                os.remove(output_filename) # remove the old copy of the data
             except OSError:
                 pass
             
@@ -103,7 +104,7 @@ class TNMRGradEnv(gym.Env):
             measured_waveform = recorded_data['measured_waveform']
  
             print('Done measuring on TNMR!')
-            self.set_scanner_is_occupied(is_occupied=False)
+            #self.set_scanner_is_occupied(is_occupied=False)
 
             reward = - np.sum(np.abs(error_v**2))
             print(f'REWARD ={reward}')
@@ -170,14 +171,14 @@ class TNMRGradEnv(gym.Env):
     def _execute_remote_measurement(self, designed_waveform_filename, output_filename):
 
         # Step 1: Put the designed waveform file on the remote (TNMR)
-        self._put_file_on_remote(designed_waveform_filename, 'D:/Jonathan/gradient_RL_lowfield/io/'+designed_waveform_filename, verbose=True)
+        self._put_file_on_remote(designed_waveform_filename, 'D:/Jonathan/gradient_RL_lowfield/io/input/'+designed_waveform_filename, verbose=True)
 
         # Step 2: (On the remote....) Perform the measurement. The design file will be taken up, and a measurement file will be generated.
-        # During this time, just wait.
+        # During this time, just wait. This takes a minimum of 30 seconds so just sleep during that time... 
         time.sleep(30)
 
         # Step 3: Get the measurement files
-        self._get_file_from_remote('D:/Jonathan/gradient_RL_lowfield/io/'+output_filename, output_filename, verbose=True)
+        self._get_file_from_remote('D:/Jonathan/gradient_RL_lowfield/io/output/'+output_filename, output_filename, verbose=True)
         return 
         
 
@@ -186,15 +187,23 @@ class TNMRGradEnv(gym.Env):
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         client.connect(self.remote_ip, username=self.remote_username, password=self.remote_password)
         
+        file_present = False
+
         if verbose:
             print(f'Getting file: {filepath}')
-        try:
-            sftp = client.open_sftp()
-            sftp.get(remotepath=remotepath, localpath=filepath)
-            sftp.close()
+        while not file_present:
+            time.sleep(5)
+            try:
+                sftp = client.open_sftp()
+                sftp.get(remotepath=remotepath, localpath=filepath)
+                sftp.close()
 
-        except:
-            print('Getting file from remote failed')
+            except IOError:
+                print('Getting file from remote failed. Waiting ... ')
+
+            else: 
+                file_present = True
+                print('Getting file from remote succeeded! ')
         
         client.close()
 
