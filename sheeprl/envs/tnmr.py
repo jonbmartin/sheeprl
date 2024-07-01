@@ -187,7 +187,8 @@ class TNMRGradEnv(gym.Env):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         client.connect(self.remote_ip, username=self.remote_username, password=self.remote_password)
-        
+        sftp = client.open_sftp()
+
         file_present = False
 
         if verbose:
@@ -195,7 +196,6 @@ class TNMRGradEnv(gym.Env):
         while not file_present:
             time.sleep(5)
             try:
-                sftp = client.open_sftp()
                 sftp.get(remotepath=remotepath, localpath=filepath)
                 sftp.remove(remotepath)
                 sftp.close()
