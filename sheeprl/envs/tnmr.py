@@ -9,6 +9,7 @@ import scipy.io as sio
 import matplotlib.pyplot as plt
 import os, sys, time
 import paramiko
+import yaml
 
 class TNMRGradEnv(gym.Env):
     def __init__(self, id:str, action_dim: int = 1,
@@ -51,10 +52,8 @@ class TNMRGradEnv(gym.Env):
         self.upper_amp_limit = 100
         self.lower_amp_limit = -100
 
-        # initialize matlab
-        #eng = matlab.engine.start_matlab()
-        #self.matlab_eng = eng
-        #print('TNMR GRAD ENVIRONMENT INITIALIZED')
+        # set scanner state to false!
+        self.set_scanner_is_occupied(False)
 
 
 
@@ -75,6 +74,16 @@ class TNMRGradEnv(gym.Env):
         # When you reach the end of the pulse, measure the full waveform and record all relevant information to compute episode reward
         if self._current_step == self._n_steps-1:
 
+            # check yaml to make sure scanner is not currently scanning
+            tnmr_occupied = self.get_scanner_is_occupied()
+
+            while(tnmr_occupied):
+                time.sleep(2)
+                tnmr_occupied = self.get_scanner_is_occupied()
+            
+            # once free, set as occupied!
+            self.set_scanner_is_occupied(is_occupied=True)
+
             designed_waveform_filename = 'designed_gradient_pulse.mat'
             output_filename = 'current_measurement_data.mat'
             sio.savemat(designed_waveform_filename,{'designed_p':self.preemphasized_waveform})
@@ -93,6 +102,7 @@ class TNMRGradEnv(gym.Env):
             measured_waveform = recorded_data['measured_waveform']
  
             print('Done measuring on TNMR!')
+            self.set_scanner_is_occupied(is_occupied=False)
 
             reward = - np.sum(np.abs(error_v**2))
             print(f'REWARD ={reward}')
@@ -126,6 +136,31 @@ class TNMRGradEnv(gym.Env):
         observation = self.get_obs()
 
         return observation, {}
+    
+    def get_scanner_is_occupied(self):
+        # just gets whether the scanner is in use right now or not
+        with open("tnmr_scanner_state/tnmr_scanner.yaml") as f:
+            cfg_tnmr = yaml.load(f, Loader=yaml.FullLoader)
+
+        return cfg_tnmr["scanner_occupied"]
+
+    def set_scanner_is_occupied(self, is_occupied):
+        # sets the status of the scanner so that other processes know not to scan
+
+        # load yaml
+        with open("tnmr_scanner_state/tnmr_scanner.yaml") as f:
+            cfg_tnmr = yaml.load(f, Loader=yaml.FullLoader)
+
+        # modify parameter
+        cfg_tnmr["scanner_occupied"] = is_occupied
+ 
+        # write yaml
+        with open("config.yaml", "w") as f:
+            cfg_tnmr = yaml.dump(
+                cfg_tnmr, stream=f, default_flow_style=False, sort_keys=False
+            )
+
+        return
     
 
     def render(self, mode="human", close=False):

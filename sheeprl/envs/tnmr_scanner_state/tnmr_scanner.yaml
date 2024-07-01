@@ -1,0 +1,2 @@
+# to coordinate scanning among processes: 
+scanner_occupied: False
