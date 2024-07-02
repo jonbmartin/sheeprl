@@ -23,6 +23,7 @@ class TNMRGradEnv(gym.Env):
         self.ideal_waveform_padded = np.concatenate([np.zeros(vector_size),self.ideal_waveform, np.zeros(vector_size)])
 
         self.preemphasis_v = np.zeros(np.shape(self.ideal_waveform))
+        self.preemphasis_v_padded = np.concatenate([np.zeros(self.window_size),self.preemphasis_v, np.zeros(self.window_size)])
 
         print(np.shape(self.ideal_waveform_padded))
 
