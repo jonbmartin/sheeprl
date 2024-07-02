@@ -20,9 +20,11 @@ algo:
     encoder: 
       - pulse
       - time
+      - preemph
     decoder: 
       - pulse
       - time
+      - preemph
 # Checkpoint
 checkpoint:
   every: 20000

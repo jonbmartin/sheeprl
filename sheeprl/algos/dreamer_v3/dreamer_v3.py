@@ -649,7 +649,7 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
                 reset_data["is_first"] = np.zeros_like(reset_data["terminated"])
                 rb.add(reset_data, dones_idxes, validate_args=cfg.buffer.validate_args)
 
-                # Reset already inserted step data
+                # Reset already inserted step datarb
                 step_data["rewards"][:, dones_idxes] = np.zeros_like(reset_data["rewards"])
                 step_data["terminated"][:, dones_idxes] = np.zeros_like(step_data["terminated"][:, dones_idxes])
                 step_data["truncated"][:, dones_idxes] = np.zeros_like(step_data["truncated"][:, dones_idxes])

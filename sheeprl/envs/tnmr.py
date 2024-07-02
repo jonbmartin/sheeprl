@@ -16,11 +16,14 @@ class TNMRGradEnv(gym.Env):
                   vector_size: Tuple[int] = (130,),
                   dict_obs_space: bool = True,):
         self.action_space = gym.spaces.Box(-1, 1, shape=(action_dim,)) # bounded to reasonable values based on the achievable slew
-        self.window_size = vector_size[0]
+        self.vector_size = vector_size[0]
 
         self.ideal_waveform = np.squeeze(sio.loadmat('ideal_gradient_pulse.mat')['ideal_p'])
         self.ideal_waveform = np.array(self.ideal_waveform.astype('float'))
         self.ideal_waveform_padded = np.concatenate([np.zeros(vector_size),self.ideal_waveform, np.zeros(vector_size)])
+
+        self.preemphasis_v = np.zeros(np.shape(self.ideal_waveform))
+
         print(np.shape(self.ideal_waveform_padded))
 
         self._dict_obs_space = dict_obs_space
@@ -29,6 +32,7 @@ class TNMRGradEnv(gym.Env):
                 {
                     "pulse": gym.spaces.Box(-100, 100, shape=vector_size, dtype=np.float32),
                     "time": gym.spaces.Box(0.0, np.size(self.ideal_waveform), (1,), dtype=np.float32),
+                    "preemph": gym.spaces.Box(-100, 100, shape=vector_size, dtype=np.float32),
                 }
             )
         else:
@@ -67,6 +71,8 @@ class TNMRGradEnv(gym.Env):
         
         action = action * self.action_scale
         self.preemphasis_v[self._current_step] = action
+        self.preemphasis_v_padded = np.concatenate([np.zeros(self.vector_size),self.preemphasis_v, np.zeros(self.vector_size)])
+
 
         self.preemphasized_waveform = self.ideal_waveform + self.preemphasis_v
 
@@ -231,10 +237,14 @@ class TNMRGradEnv(gym.Env):
     def get_obs(self) -> Dict[str, np.ndarray]: 
         current_point_in_padded = self._current_step + self.window_size
         ideal_window = self.ideal_waveform_padded[(current_point_in_padded-self.window_size//2):(current_point_in_padded + self.window_size//2)]
+        preemphasis_window = self.preemphasis_v_padded[(current_point_in_padded-self.window_size//2):(current_point_in_padded + self.window_size//2)]
+        
         if self._dict_obs_space:
             return {
                 "pulse": np.squeeze(np.array(ideal_window, dtype=np.float32)),
                 "time": np.squeeze(np.array(self._current_step, dtype=np.float)),
+                "preemph": np.squeeze(np.array(preemphasis_window, dtype=np.float32)),
+
             }
         else:
             return np.squeeze(np.array(ideal_window, dtype=np.float32))
