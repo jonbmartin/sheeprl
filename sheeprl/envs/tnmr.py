@@ -16,7 +16,7 @@ class TNMRGradEnv(gym.Env):
                   vector_size: Tuple[int] = (130,),
                   dict_obs_space: bool = True,):
         self.action_space = gym.spaces.Box(-1, 1, shape=(action_dim,)) # bounded to reasonable values based on the achievable slew
-        self.vector_size = vector_size[0]
+        self.window_size = vector_size[0]
 
         self.ideal_waveform = np.squeeze(sio.loadmat('ideal_gradient_pulse.mat')['ideal_p'])
         self.ideal_waveform = np.array(self.ideal_waveform.astype('float'))
@@ -71,7 +71,7 @@ class TNMRGradEnv(gym.Env):
         
         action = action * self.action_scale
         self.preemphasis_v[self._current_step] = action
-        self.preemphasis_v_padded = np.concatenate([np.zeros(self.vector_size),self.preemphasis_v, np.zeros(self.vector_size)])
+        self.preemphasis_v_padded = np.concatenate([np.zeros(self.window_size),self.preemphasis_v, np.zeros(self.window_size)])
 
 
         self.preemphasized_waveform = self.ideal_waveform + self.preemphasis_v
