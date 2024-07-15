@@ -536,6 +536,7 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
         )
 
     # Get the first environment observation and start the optimization
+    all_episode_step_data = []
     step_data = {}
     obs = envs.reset(seed=cfg.seed)[0]
     for k in obs_keys:
@@ -584,7 +585,8 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
                         )
 
                 step_data["actions"] = actions.reshape((1, cfg.env.num_envs, -1))
-                rb.add(step_data, validate_args=cfg.buffer.validate_args)
+                all_episode_step_data.append(step_data)
+                rb.add(all_episode_step_data[-1], validate_args=cfg.buffer.validate_args)
 
                 next_obs, rewards, terminated, truncated, infos = envs.step(
                     real_actions.reshape(envs.action_space.shape)
@@ -647,6 +649,7 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
                 reset_data["actions"] = np.zeros((1, reset_envs, np.sum(actions_dim)))
                 reset_data["rewards"] = step_data["rewards"][:, dones_idxes]
                 reset_data["is_first"] = np.zeros_like(reset_data["terminated"])
+                # TODO: here, add all data since last reset to RB 
                 rb.add(reset_data, dones_idxes, validate_args=cfg.buffer.validate_args)
 
                 # Reset already inserted step datarb
