@@ -111,7 +111,9 @@ class TNMRGradEnv(gym.Env):
  
             print('Done measuring on TNMR!')
             #self.set_scanner_is_occupied(is_occupied=False)
-
+            reward_v = - np.abs(error_v**2)
+            print('REWARD V SIZE')
+            print(np.size(reward_v))
             reward = - np.sum(np.abs(error_v**2))
             print(f'REWARD ={reward}')
         else:
