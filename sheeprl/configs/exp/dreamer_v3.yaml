@@ -2,7 +2,7 @@
 
 defaults:
   - override /algo: dreamer_v3_M # JBM changed to XXS from S
-  - override /env: atari
+  #- override /env: atari
   - override /model_manager: dreamer_v3
   - _self_
 
