@@ -47,6 +47,9 @@ class TNMRGradEnv(gym.Env):
         self._n_grad_measurement_averages = 1.0
         self.action_scale = 20
 
+        # this determines how often you actually collect data on TNMR
+        self.measure_interval = 50
+
         # info for communicating to the TNMR magnet
         self.remote_ip = '10.115.11.91'
         self.remote_username = 'grissomlfi'
@@ -80,17 +83,8 @@ class TNMRGradEnv(gym.Env):
         self.preemphasized_waveform = np.clip(self.preemphasized_waveform, self.lower_amp_limit, self.upper_amp_limit)
 
         # When you reach the end of the pulse, measure the full waveform and record all relevant information to compute episode reward
-        if self._current_step == self._n_steps-1:
+        if self._current_step > 0 and np.mod(self._current_step, self.measure_interval):
 
-            # # check yaml to make sure scanner is not currently scanning
-            # tnmr_occupied = self.get_scanner_is_occupied()
-
-            # while(tnmr_occupied):
-            #     time.sleep(2)
-            #     tnmr_occupied = self.get_scanner_is_occupied()
-            
-            # # once free, set as occupied!
-            # self.set_scanner_is_occupied(is_occupied=True)
 
             designed_waveform_filename = 'designed_gradient_pulse_'+str(self.env_scanning_id)+'.mat'
             output_filename = 'current_measurement_data_'+str(self.env_scanning_id)+'.mat'
@@ -104,13 +98,11 @@ class TNMRGradEnv(gym.Env):
             
             self._execute_remote_measurement(designed_waveform_filename, output_filename)
 
-            #matlab_done = self.matlab_eng.iterative_measurement_function(self._n_grad_measurement_averages)
             recorded_data = sio.loadmat(output_filename)
             error_v = recorded_data['error']
             measured_waveform = recorded_data['measured_waveform']
  
             print('Done measuring on TNMR!')
-            #self.set_scanner_is_occupied(is_occupied=False)
             reward_v = - np.abs(error_v**2)
             print('REWARD V SIZE')
             print(np.size(reward_v))
