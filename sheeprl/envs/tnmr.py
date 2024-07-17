@@ -83,8 +83,8 @@ class TNMRGradEnv(gym.Env):
         self.preemphasized_waveform = np.clip(self.preemphasized_waveform, self.lower_amp_limit, self.upper_amp_limit)
 
         # When you reach the end of the pulse, measure the full waveform and record all relevant information to compute episode reward
-        if self._current_step > 0 and np.mod(self._current_step, self.measure_interval):
-
+        if (self._current_step > 0) and (np.mod(self._current_step, self.measure_interval) != 0):
+            
 
             designed_waveform_filename = 'designed_gradient_pulse_'+str(self.env_scanning_id)+'.mat'
             output_filename = 'current_measurement_data_'+str(self.env_scanning_id)+'.mat'
