@@ -47,6 +47,7 @@ class TNMRGradEnv(gym.Env):
 
         # this determines how often you actually collect data on TNMR
         self.measure_interval = 50
+        self.BASE_COST = 46.46
 
         # info for communicating to the TNMR magnet
         self.remote_ip = '10.115.11.91'
@@ -105,6 +106,7 @@ class TNMRGradEnv(gym.Env):
             #reward_v = - np.abs(error_v[(self._current_step-self.measure_interval):self._current_step]**2)
             #reward = np.sum(reward_v)
             reward = - np.sum(np.abs(error_v**2))/self._n_steps
+            reward = reward + self.BASE_COST # set baseline so that cost is 0 
             print(f'REWARD ={reward}')
         else:
             reward = 0
