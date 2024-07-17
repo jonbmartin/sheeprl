@@ -100,12 +100,12 @@ class TNMRGradEnv(gym.Env):
             error_v = recorded_data['error']
             measured_waveform = recorded_data['measured_waveform']
  
+            # reward is the cost up to the end of the window: 
             print('Done measuring on TNMR!')
-            reward_v = - np.abs(error_v**2)
+            reward_v = - np.abs(error_v[(self._current_step-self.measure_interval):self._current_step]**2)
             print('REWARD V SIZE')
             print(np.size(reward_v))
-            # normalize reward by number of steps overall
-            reward = - np.sum(np.abs(error_v**2))/self._n_steps
+            reward = - np.sum(np.abs(error_v**2))/self.measure_interval
             print(f'REWARD ={reward}')
         else:
             reward = 0
