@@ -103,9 +103,8 @@ class TNMRGradEnv(gym.Env):
             # reward is the cost up to the end of the window: 
             print('Done measuring on TNMR!')
             reward_v = - np.abs(error_v[(self._current_step-self.measure_interval):self._current_step]**2)
-            print('REWARD V SIZE')
-            print(np.size(reward_v))
-            reward = - np.sum(np.abs(error_v**2))/self.measure_interval
+            reward = np.sum(reward_v)
+            #reward = - np.sum(np.abs(error_v**2))/self.measure_interval
             print(f'REWARD ={reward}')
         else:
             reward = 0
