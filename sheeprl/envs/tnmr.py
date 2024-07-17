@@ -25,8 +25,6 @@ class TNMRGradEnv(gym.Env):
         self.preemphasis_v = np.zeros(np.shape(self.ideal_waveform))
         self.preemphasis_v_padded = np.concatenate([np.zeros(self.window_size),self.preemphasis_v, np.zeros(self.window_size)])
 
-        print(np.shape(self.ideal_waveform_padded))
-
         self._dict_obs_space = dict_obs_space
         if self._dict_obs_space:
             self.observation_space = gym.spaces.Dict(
@@ -106,7 +104,8 @@ class TNMRGradEnv(gym.Env):
             reward_v = - np.abs(error_v**2)
             print('REWARD V SIZE')
             print(np.size(reward_v))
-            reward = - np.sum(np.abs(error_v**2))
+            # normalize reward by number of steps overall
+            reward = - np.sum(np.abs(error_v**2))/self._n_steps
             print(f'REWARD ={reward}')
         else:
             reward = 0
