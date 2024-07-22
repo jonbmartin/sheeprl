@@ -31,7 +31,7 @@ class TNMRGradEnv(gym.Env):
                 {
                     "pulse": gym.spaces.Box(-100, 100, shape=vector_size, dtype=np.float32),
                     "time": gym.spaces.Box(0.0, np.size(self.ideal_waveform), (1,), dtype=np.float32),
-                    "preemph": gym.spaces.Box(-100, 100, shape=vector_size, dtype=np.float32),
+                    #"preemph": gym.spaces.Box(-100, 100, shape=vector_size, dtype=np.float32),
                 }
             )
         else:
@@ -239,7 +239,7 @@ class TNMRGradEnv(gym.Env):
             return {
                 "pulse": np.squeeze(np.array(ideal_window, dtype=np.float32)),
                 "time": np.squeeze(np.array(self._current_step, dtype=np.float)),
-                "preemph": np.squeeze(np.array(preemphasis_window, dtype=np.float32)),
+                #"preemph": np.squeeze(np.array(preemphasis_window, dtype=np.float32)),
 
             }
         else:
