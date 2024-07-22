@@ -8,6 +8,10 @@ max_episode_steps: 2000
 num_envs: 1
 action_repeat: 2
 capture_video: False
+actions_as_observation:
+  num_stack: 65
+  noop: 0.0
+  dilation: 2
 
 
 # Wrapper to be instantiated
