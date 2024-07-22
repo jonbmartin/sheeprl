@@ -18,7 +18,7 @@ class TNMRGradEnv(gym.Env):
         self.action_space = gym.spaces.Box(-1, 1, shape=(action_dim,)) # bounded to reasonable values based on the achievable slew
         self.window_size = vector_size[0]
 
-        self.ideal_waveform = np.squeeze(sio.loadmat('ideal_gradient_pulse.mat')['ideal_p'])
+        self.ideal_waveform = np.squeeze(sio.loadmat('ideal_bipolar.mat')['ideal_p'])
         self.ideal_waveform = np.array(self.ideal_waveform.astype('float'))
         self.ideal_waveform_padded = np.concatenate([np.zeros(vector_size),self.ideal_waveform, np.zeros(vector_size)])
 
