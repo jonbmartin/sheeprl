@@ -53,7 +53,7 @@ class TNMRGradEnv(gym.Env):
         self.remote_ip = '10.115.11.91'
         self.remote_username = 'grissomlfi'
         self.remote_password = os.environ['GRISSOM_LFI_PWD']
-        self.render_mode='human'
+        self.render_mode='None'
 
         # constraints
         self.upper_amp_limit = 100
