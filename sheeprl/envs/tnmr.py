@@ -47,7 +47,7 @@ class TNMRGradEnv(gym.Env):
 
         # this determines how often you actually collect data on TNMR
         self.measure_interval = 50
-        self.BASE_COST = 46.46
+        self.BASE_COST = 10
 
         # info for communicating to the TNMR magnet
         self.remote_ip = '10.115.11.91'
