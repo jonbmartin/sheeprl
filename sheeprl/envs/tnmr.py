@@ -43,7 +43,7 @@ class TNMRGradEnv(gym.Env):
         self._n_steps = self.ideal_waveform.size
         self._current_step = 0
         self._n_grad_measurement_averages = 1.0
-        self.action_scale = 40
+        self.action_scale = 35
 
         # this determines how often you actually collect data on TNMR
         self.measure_interval = 50
