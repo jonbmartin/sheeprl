@@ -25,7 +25,7 @@ algo:
       - time
 # Checkpoint
 checkpoint:
-  every: 100000
+  every: 25000
   #resume_from: './logs/runs/dreamer_v3//TNMRGradEnv/2024-07-01_23-37-09_dreamer_v3_TNMRGradEnv_42/version_0/checkpoint/ckpt_1400000_0.ckpt'
 
 # Buffer
