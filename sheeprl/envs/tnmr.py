@@ -177,7 +177,7 @@ class TNMRGradEnv(gym.Env):
 
         # Step 2: (On the remote....) Perform the measurement. The design file will be taken up, and a measurement file will be generated.
         # During this time, just wait. This takes a minimum of 30 seconds so just sleep during that time... 
-        time.sleep(16)
+        time.sleep(18)
 
         # Step 3: Get the measurement files
         self._get_file_from_remote('D:/Jonathan/gradient_RL_lowfield/io/output/'+output_filename, output_filename, verbose=True)
