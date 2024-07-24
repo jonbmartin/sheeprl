@@ -203,7 +203,7 @@ class TNMRGradEnv(gym.Env):
                 sftp.close()
 
             except IOError:
-                print('File not ready on remote. Waiting ... ')
+                print(f'File {self.env_scanning_id} not ready on remote. Waiting ... ')
 
             else: 
                 file_present = True
