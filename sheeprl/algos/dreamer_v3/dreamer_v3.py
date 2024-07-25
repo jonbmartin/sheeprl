@@ -655,10 +655,11 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
             step_data["rewards"] = clip_rewards_fn(rewards)
 
             dones_idxes = dones.nonzero()[0].tolist()
-            print('DONE INDEXES: ')
-            print(dones_idxes)
+
             reset_envs = len(dones_idxes)
             if reset_envs > 0:
+                print('DONE INDEXES: ')
+                print(dones_idxes)
                 reset_data = {}
                 for k in obs_keys:
                     reset_data[k] = (real_next_obs[k][dones_idxes])[np.newaxis]
