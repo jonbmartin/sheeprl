@@ -686,6 +686,7 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
 
                 while len(step_data_list)>0:
                     step_data_with_reward = step_data_list.pop(0)
+                    step_data_with_reward["rewards"] = np.ones((1, cfg.env.num_envs, 1))*reward_v.pop(0)
                     rb.add(step_data_with_reward, validate_args=cfg.buffer.validate_args)
 
         # Train the agent
