@@ -15,12 +15,15 @@ import hydra
 import numpy as np
 import torch
 import torch.nn.functional as F
+import scipy.io as sio
+
 from lightning.fabric import Fabric
 from lightning.fabric.wrappers import _FabricModule
 from torch import Tensor
 from torch.distributions import Distribution, Independent, OneHotCategorical
 from torch.optim import Optimizer
 from torchmetrics import SumMetric
+
 
 from sheeprl.algos.dreamer_v3.agent import WorldModel, build_agent
 from sheeprl.algos.dreamer_v3.loss import reconstruction_loss
@@ -674,7 +677,10 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
                 # JBM: UPDATE THE REWARDS OF OUR LIST OF STEP DATA, AND ADD TO THE BUFFER!!!
                 print('OK, NOW REASSIGNING REWARDS!!')
                 print(len(step_data_list))
-                while len(step_data_list)>0:
+                recorded_data = sio.loadmat('generic_current_data.mat')
+                error_v = recorded_data['error']
+                print(error_v)
+            while len(step_data_list)>0:
                     step_data_with_reward = step_data_list.pop(0)
                     rb.add(step_data_with_reward, validate_args=cfg.buffer.validate_args)
 

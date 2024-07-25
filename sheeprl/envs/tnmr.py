@@ -5,6 +5,7 @@ from gymnasium import spaces
 from gymnasium.core import RenderFrame
 import numpy as np
 
+import shutil
 import scipy.io as sio
 import matplotlib.pyplot as plt
 import os, sys, time, random
@@ -99,6 +100,8 @@ class TNMRGradEnv(gym.Env):
             
             self._execute_remote_measurement(designed_waveform_filename, output_filename)
 
+            # SAVE A COPY WITH A GENERIC NAME:
+            shutil.copyfile(output_filename, 'generic_current_data.mat')
             recorded_data = sio.loadmat(output_filename)
             error_v = recorded_data['error']
             measured_waveform = recorded_data['measured_waveform']
