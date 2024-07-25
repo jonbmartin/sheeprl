@@ -6,7 +6,7 @@ defaults:
 id: TNMRGradEnv
 max_episode_steps: 2000
 num_envs: 1
-action_repeat: 2
+action_repeat: 1
 capture_video: False
 actions_as_observation:
   num_stack: 80
