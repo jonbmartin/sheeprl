@@ -679,8 +679,11 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
                 print(len(step_data_list))
                 recorded_data = sio.loadmat('generic_current_data.mat')
                 error_v = recorded_data['error']
-                print(error_v)
-            while len(step_data_list)>0:
+                reward_v = - np.abs(error_v**2)
+                reward_v = reward_v.to_list()
+                print(reward_v)
+
+                while len(step_data_list)>0:
                     step_data_with_reward = step_data_list.pop(0)
                     rb.add(step_data_with_reward, validate_args=cfg.buffer.validate_args)
 
