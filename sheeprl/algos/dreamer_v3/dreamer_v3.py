@@ -680,13 +680,14 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
                 recorded_data = sio.loadmat('generic_current_data.mat')
                 error_v = recorded_data['error']
                 reward_v = - np.abs(error_v**2)
-                reward_v = reward_v.tolist()
-                reward_v = reward_v[0] # get 1d
-                print(reward_v)
+                reward_list = reward_v.tolist()
+                reward_list = reward_list[0] # get 1d
 
                 while len(step_data_list)>0:
+                    print(len(step_data_list))
+                    print(len(reward_list))
                     step_data_with_reward = step_data_list.pop(0)
-                    step_data_with_reward["rewards"] = np.ones((1, cfg.env.num_envs, 1))*reward_v.pop(0)
+                    step_data_with_reward["rewards"] = np.ones((1, cfg.env.num_envs, 1))*reward_list.pop(0)
                     rb.add(step_data_with_reward, validate_args=cfg.buffer.validate_args)
 
         # Train the agent
