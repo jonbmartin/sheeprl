@@ -108,8 +108,8 @@ class TNMRGradEnv(gym.Env):
             self.reward_v = - np.abs(error_v**2)
             self.reward_known = True
             print(f'NET ERROR: {np.sum(np.abs(error_v**2))}')
-            reward = reward + self.BASE_COST # set baseline so that cost is 0 
             reward = 0
+            #reward = reward + self.BASE_COST # set baseline so that cost is 0 
             print(f'REWARD ={reward}')
         else: 
             reward = 0
