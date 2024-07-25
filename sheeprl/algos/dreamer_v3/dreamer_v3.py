@@ -682,7 +682,7 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
                 reward_v = - np.abs(error_v**2)
                 reward_list = reward_v.tolist()
                 reward_list = reward_list[0] # get 1d
-
+                print(f'EPISODE REWARD = {sum(reward_list)}')
                 while len(step_data_list)>0:
                     step_data_with_reward = step_data_list.pop(0)
                     step_data_with_reward["rewards"] = np.ones((1, cfg.env.num_envs, 1))*reward_list.pop(0)
