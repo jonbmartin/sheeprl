@@ -680,7 +680,7 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
                 recorded_data = sio.loadmat('generic_current_data.mat')
                 error_v = recorded_data['error']
                 reward_v = - np.abs(error_v**2)
-                reward_v = reward_v.tolist()
+                reward_v = np.squeeze(reward_v).tolist()
                 print(reward_v)
 
                 while len(step_data_list)>0:
