@@ -380,6 +380,9 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
     log_dir = get_log_dir(fabric, cfg.root_dir, cfg.run_name)
     fabric.print(f"Log dir: {log_dir}")
 
+    # JBM adding to store up a collection of steps
+    step_data_list = []
+
     # Environment setup
     vectorized_env = gym.vector.SyncVectorEnv if cfg.env.sync_env else gym.vector.AsyncVectorEnv
     envs = vectorized_env(
@@ -585,7 +588,16 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
 
                 # JBM: here we take our action and make observations in the environment.
                 # Will want to add all of this data to a list, where reward can be modified @ each step
+                # Pseudocode:
+                #1) add step_data to a list. 
+                #2) IF the environment has reward data:
+                #   a) update all of the step_data with the appropriate reward
+                #   b) add ALL of the data with reward to the RB.
+                #   c) clear the list 
                 step_data["actions"] = actions.reshape((1, cfg.env.num_envs, -1))
+                step_data_list.append(step_data)
+                step_data = step_data_list.pop(0)
+
                 rb.add(step_data, validate_args=cfg.buffer.validate_args)
 
                 next_obs, rewards, terminated, truncated, infos = envs.step(
@@ -637,8 +649,7 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
             step_data["terminated"] = terminated.reshape((1, cfg.env.num_envs, -1))
             step_data["truncated"] = truncated.reshape((1, cfg.env.num_envs, -1))
             step_data["rewards"] = clip_rewards_fn(rewards)
-            print('HERE ARE SOME REWARDS FROM THE STEP: ')
-            print(step_data["rewards"])
+
             dones_idxes = dones.nonzero()[0].tolist()
             reset_envs = len(dones_idxes)
             if reset_envs > 0:

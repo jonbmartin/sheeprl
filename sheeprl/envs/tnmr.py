@@ -24,7 +24,7 @@ class TNMRGradEnv(gym.Env):
 
         self.preemphasis_v = np.zeros(np.shape(self.ideal_waveform))
         self.preemphasis_v_padded = np.concatenate([np.zeros(self.window_size),self.preemphasis_v, np.zeros(self.window_size)])
-
+        
         self._dict_obs_space = dict_obs_space
         if self._dict_obs_space:
             self.observation_space = gym.spaces.Dict(
@@ -46,7 +46,9 @@ class TNMRGradEnv(gym.Env):
         self.action_scale = 30
 
         # this determines how often you actually collect data on TNMR
-        self.measure_interval = 50
+        self.measure_interval = self._n_steps
+        self.reward_v = np.zeros((self._n_steps,1))
+        self.reward_known = False
         self.BASE_COST = 10
 
         # info for communicating to the TNMR magnet
@@ -103,9 +105,11 @@ class TNMRGradEnv(gym.Env):
  
             # reward is the cost up to the end of the window: 
             print('Done measuring on TNMR!')
-            reward = - np.sum(np.abs(error_v**2))/self._n_steps
+            self.reward_v = - np.abs(error_v**2)
+            self.reward_known = True
             print(f'NET ERROR: {np.sum(np.abs(error_v**2))}')
             reward = reward + self.BASE_COST # set baseline so that cost is 0 
+            reward = 0
             print(f'REWARD ={reward}')
         else: 
             reward = 0
@@ -133,6 +137,10 @@ class TNMRGradEnv(gym.Env):
         self._current_step = 0
         self.preemphasized_waveform = self.ideal_waveform
         self.preemphasis_v = np.zeros(np.shape(self.ideal_waveform))
+        
+        #reset everything that we are using to track reward
+        self.reward_known = False
+        self.reward_v = self.reward_v * 0
 
         observation = self.get_obs()
 
