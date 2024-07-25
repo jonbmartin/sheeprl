@@ -9,7 +9,7 @@ num_envs: 1
 action_repeat: 2
 capture_video: False
 actions_as_observation:
-  num_stack: 65
+  num_stack: 80
   noop: 0.0
   dilation: 2
 

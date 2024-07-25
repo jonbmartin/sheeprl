@@ -583,6 +583,8 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
                             torch.stack([real_act.argmax(dim=-1) for real_act in real_actions], dim=-1).cpu().numpy()
                         )
 
+                # JBM: here we take our action and make observations in the environment.
+                # Will want to add all of this data to a list, where reward can be modified @ each step
                 step_data["actions"] = actions.reshape((1, cfg.env.num_envs, -1))
                 rb.add(step_data, validate_args=cfg.buffer.validate_args)
 
@@ -635,7 +637,8 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
             step_data["terminated"] = terminated.reshape((1, cfg.env.num_envs, -1))
             step_data["truncated"] = truncated.reshape((1, cfg.env.num_envs, -1))
             step_data["rewards"] = clip_rewards_fn(rewards)
-
+            print('HERE ARE SOME REWARDS FROM THE STEP: ')
+            print(step_data["rewards"])
             dones_idxes = dones.nonzero()[0].tolist()
             reset_envs = len(dones_idxes)
             if reset_envs > 0:

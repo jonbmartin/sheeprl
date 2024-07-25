@@ -46,7 +46,7 @@ class TNMRGradEnv(gym.Env):
         self.action_scale = 30
 
         # this determines how often you actually collect data on TNMR
-        self.measure_interval = 60
+        self.measure_interval = 50
         self.BASE_COST = 10
 
         # info for communicating to the TNMR magnet
@@ -103,8 +103,6 @@ class TNMRGradEnv(gym.Env):
  
             # reward is the cost up to the end of the window: 
             print('Done measuring on TNMR!')
-            #reward_v = - np.abs(error_v[(self._current_step-self.measure_interval):self._current_step]**2)
-            #reward = np.sum(reward_v)
             reward = - np.sum(np.abs(error_v**2))/self._n_steps
             print(f'NET ERROR: {np.sum(np.abs(error_v**2))}')
             reward = reward + self.BASE_COST # set baseline so that cost is 0 
@@ -116,8 +114,7 @@ class TNMRGradEnv(gym.Env):
         self._current_step += 1
 
         observation = self.get_obs()
-        #plt.plot(np.transpose(observation))
-        #plt.show()
+
 
         return (
             observation,
