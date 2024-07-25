@@ -597,6 +597,7 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
                 step_data["actions"] = actions.reshape((1, cfg.env.num_envs, -1))
                 step_data_list.append(step_data)
                 step_data = step_data_list.pop(0)
+                print(step_data)
 
                 rb.add(step_data, validate_args=cfg.buffer.validate_args)
 
