@@ -46,7 +46,7 @@ class TNMRGradEnv(gym.Env):
         self.action_scale = 30
 
         # this determines how often you actually collect data on TNMR
-        self.measure_interval = self._n_steps
+        self.measure_interval = self._n_steps-1
         self.reward_v = np.zeros((self._n_steps,1))
         self.reward_known = False
         self.BASE_COST = 10
