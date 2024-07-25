@@ -590,16 +590,16 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
                 # Will want to add all of this data to a list, where reward can be modified @ each step
                 # Pseudocode:
                 #1) add step_data to a list. 
-                #2) IF the environment has reward data:
+                #2) IF the environment has reward data (which is known @ reset):
                 #   a) update all of the step_data with the appropriate reward
                 #   b) add ALL of the data with reward to the RB.
                 #   c) clear the list 
                 step_data["actions"] = actions.reshape((1, cfg.env.num_envs, -1))
                 step_data_list.append(step_data)
-                step_data = step_data_list.pop(0)
-                print(step_data)
+                #step_data = step_data_list.pop(0)
+                #print(step_data)
 
-                rb.add(step_data, validate_args=cfg.buffer.validate_args)
+                #rb.add(step_data, validate_args=cfg.buffer.validate_args)
 
                 next_obs, rewards, terminated, truncated, infos = envs.step(
                     real_actions.reshape(envs.action_space.shape)
@@ -670,6 +670,13 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
                 step_data["truncated"][:, dones_idxes] = np.zeros_like(step_data["truncated"][:, dones_idxes])
                 step_data["is_first"][:, dones_idxes] = np.ones_like(step_data["is_first"][:, dones_idxes])
                 player.init_states(dones_idxes)
+
+                # JBM: UPDATE THE REWARDS OF OUR LIST OF STEP DATA, AND ADD TO THE BUFFER!!!
+                print('OK, NOW REASSIGNING REWARDS!!')
+                print(len(step_data_list))
+                while len(step_data_list)>0:
+                    step_data_with_reward = step_data_list.pop(0)
+                    rb.add(step_data_with_reward, validate_args=cfg.buffer.validate_args)
 
         # Train the agent
         if iter_num >= learning_starts:
