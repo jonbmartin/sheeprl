@@ -685,7 +685,10 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
                 print(f'EPISODE REWARD = {sum(reward_list)}')
                 while len(step_data_list)>0:
                     step_data_with_reward = step_data_list.pop(0)
-                    step_data_with_reward["rewards"] = np.ones((1, cfg.env.num_envs, 1))*reward_list.pop(0)
+                    step_reward = reward_list.pop(0)
+                    print('STEP REWARD:')
+                    print(step_reward)
+                    step_data_with_reward["rewards"] = np.ones((1, cfg.env.num_envs, 1))*step_reward
                     rb.add(step_data_with_reward, validate_args=cfg.buffer.validate_args)
 
         # Train the agent
