@@ -18,8 +18,13 @@ class TNMRGradEnv(gym.Env):
         self.action_space = gym.spaces.Box(-1, 1, shape=(action_dim,)) # bounded to reasonable values based on the achievable slew
         self.window_size = vector_size[0]
 
-        self.ideal_waveform = np.squeeze(sio.loadmat('ideal_bipolar.mat')['ideal_p'])
-        self.ideal_waveform = np.array(self.ideal_waveform.astype('float'))
+        # this is an ARRAY of multiple shot waveforms [Nshot, Nt]. Initialize with just the first
+        self.ideal_waveform_array = np.squeeze(sio.loadmat('gradmat_IRT_spiral20shot.mat')['gradmat_norm'])
+        self.ideal_waveform_array = np.array(self.ideal_waveform.astype('float'))
+        self._n_shots = np.shape(self.ideal_waveform_array,0)
+        self.waveform_index = 1
+        self.ideal_waveform = self.ideal_waveform_array[self.waveform_index,:]
+
         self.ideal_waveform_padded = np.concatenate([np.zeros(vector_size),self.ideal_waveform, np.zeros(vector_size)])
 
         self.preemphasis_v = np.zeros(np.shape(self.ideal_waveform))
@@ -45,7 +50,7 @@ class TNMRGradEnv(gym.Env):
         self.action_scale = 30
 
         # this determines how often you actually collect data on TNMR
-        self.measure_interval = 35
+        self.measure_interval = 38
         self.BASE_COST = 10
 
         # info for communicating to the TNMR magnet
@@ -86,7 +91,7 @@ class TNMRGradEnv(gym.Env):
 
             designed_waveform_filename = 'designed_gradient_pulse_'+str(self.env_scanning_id)+'.mat'
             output_filename = 'current_measurement_data_'+str(self.env_scanning_id)+'.mat'
-            sio.savemat(designed_waveform_filename,{'designed_p':self.preemphasized_waveform})
+            sio.savemat(designed_waveform_filename,{'designed_p':self.preemphasized_waveform,'wave_index':self.waveform_index})
 
             print('Measuring on TNMR...')
             try:
@@ -133,6 +138,8 @@ class TNMRGradEnv(gym.Env):
 
         # reset to the beginning of the waveform, and set our preemphasis to 0
         self._current_step = 0
+        self.waveform_index = random.randint(0,self._n_shots)
+        self.ideal_waveform = self.ideal_waveform_array[self.waveform_index,:]
         self.preemphasized_waveform = self.ideal_waveform
         self.preemphasis_v = np.zeros(np.shape(self.ideal_waveform))
 
