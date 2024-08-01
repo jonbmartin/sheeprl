@@ -21,7 +21,7 @@ class TNMRGradEnv(gym.Env):
         # this is an ARRAY of multiple shot waveforms [Nshot, Nt]. Initialize with just the first
         self.ideal_waveform_array = np.squeeze(sio.loadmat('gradmat_IRT_spiral20shot.mat')['gradmat'])
         self.ideal_waveform_array = np.array(self.ideal_waveform_array.astype('float'))
-        self._n_shots = np.shape(self.ideal_waveform_array,0)
+        self._n_shots = np.shape(self.ideal_waveform_array)[0]
         self.waveform_index = 1
         self.ideal_waveform = self.ideal_waveform_array[self.waveform_index,:]
 
