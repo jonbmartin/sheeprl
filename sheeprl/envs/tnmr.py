@@ -138,7 +138,7 @@ class TNMRGradEnv(gym.Env):
 
         # reset to the beginning of the waveform, and set our preemphasis to 0
         self._current_step = 0
-        self.waveform_index = random.randint(0,self._n_shots)
+        self.waveform_index = 1 #random.randint(0,self._n_shots) # JBM just going to optimize over 1 waveform 
         self.ideal_waveform = self.ideal_waveform_array[self.waveform_index,:]
         self.preemphasized_waveform = self.ideal_waveform
         self.preemphasis_v = np.zeros(np.shape(self.ideal_waveform))
